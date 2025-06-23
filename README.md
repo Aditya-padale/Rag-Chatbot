@@ -14,11 +14,6 @@ A modern Retrieval-Augmented Generation (RAG) chatbot using FastAPI, LangChain, 
 
 ---
 
-## Demo
-![screenshot](screenshot.png)
-
----
-
 ## Getting Started
 
 ### 1. Clone the repository
@@ -54,12 +49,6 @@ uvicorn rag:app --reload
 - **Chat**: Type your question in the chat UI and get answers from your PDF knowledge base.
 - **Upload**: Use the upload form to add new PDFs, DOCX, or images. Extracted text is appended to the knowledge base.
 - **API**: Send a POST request to `/chat` with `{ "user_id": "your_id", "message": "your question" }`.
-
----
-
-## Deployment
-- **Local**: See above.
-- **Production**: Use [Render](https://render.com), [Railway](https://railway.app), or [Fly.io](https://fly.io) for easy FastAPI hosting. Vercel is not recommended for this backend.
 
 ---
 
