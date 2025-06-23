@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+langchain
+langchain-google-genai
+faiss-cpu
+tiktoken
+google-generativeai
+pydantic
+python-dotenv
+python-multipart
