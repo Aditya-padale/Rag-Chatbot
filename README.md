@@ -19,8 +19,8 @@ A modern Retrieval-Augmented Generation (RAG) chatbot using FastAPI, LangChain, 
 ### 1. Clone the repository
 ```bash
 # Replace with your repo URL
-git clone https://github.com/yourusername/gemini-rag-chatbot.git
-cd gemini-rag-chatbot
+git clone https://github.com/Aditya-padale/Rag-Chatbot.git
+cd Rag-Chatbot
 ```
 
 ### 2. Install dependencies
