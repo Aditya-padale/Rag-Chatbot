@@ -17,6 +17,7 @@ from PIL import Image
 import pytesseract
 import shutil
 from langchain.schema import Document
+from google.api_core.exceptions import ResourceExhausted
 
 app = FastAPI()
 
@@ -24,28 +25,27 @@ app = FastAPI()
 load_dotenv()
 
 # 🔐 Set your Gemini API key from .env file
-os.environ["GOOGLE_API_KEY"] = os.getenv("GOOGLE_API_KEY")
+api_key = os.getenv("GOOGLE_API_KEY")
+if api_key:
+    os.environ["GOOGLE_API_KEY"] = api_key
 
-# 📚 Load and split knowledge base from PDF with FAISS caching
-pdf_path = "sample.pdf"
+# 📚 Load and split knowledge base from TXT with FAISS caching
+kb_txt_path = "aditya_full_personal_profile.txt"
 faiss_path = "faiss_index"
-if not os.path.exists(pdf_path):
-    raise FileNotFoundError("❌ 'sample.pdf' not found. Please add your PDF knowledge base in the project directory.")
+if not os.path.exists(kb_txt_path):
+    raise FileNotFoundError("❌ 'aditya_full_personal_profile.txt' not found. Please add your TXT knowledge base in the project directory.")
 
-def extract_text_from_pdf(pdf_path):
-    text = ""
-    with pdfplumber.open(pdf_path) as pdf:
-        for page in pdf.pages:
-            text += page.extract_text() or ""
-    return text
+def extract_text_from_txt(txt_path):
+    with open(txt_path, "r", encoding="utf-8") as f:
+        return f.read()
 
 gemini_embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
 
 if os.path.exists(faiss_path):
     vectorstore = FAISS.load_local(faiss_path, gemini_embeddings, allow_dangerous_deserialization=True)
 else:
-    pdf_text = extract_text_from_pdf(pdf_path)
-    raw_docs = [Document(page_content=pdf_text)]
+    kb_text = extract_text_from_txt(kb_txt_path)
+    raw_docs = [Document(page_content=kb_text)]
     splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
     docs = splitter.split_documents(raw_docs)
     vectorstore = FAISS.from_documents(docs, gemini_embeddings)
@@ -68,8 +68,61 @@ class UserMessage(BaseModel):
 
 @app.post("/chat")
 async def chat_endpoint(msg: UserMessage):
-    response = qa_chain.run(msg.message)
-    return {"response": response}
+    docs = vectorstore.similarity_search(msg.message, k=1)
+    fallback_phrases = [
+        "I cannot answer",
+        "does not contain",
+        "not found",
+        "not available",
+        "no information",
+        "I'm sorry"
+    ]
+    use_gemini = False
+    response = ""
+    if not docs or docs[0].page_content.strip() == "":
+        use_gemini = True
+    else:
+        response = qa_chain.run(msg.message)
+        if any(phrase.lower() in str(response).lower() for phrase in fallback_phrases):
+            use_gemini = True
+
+    if use_gemini:
+        # Robustly build chat history prompt
+        chat_history = memory.load_memory_variables({}).get("chat_history", [])
+        history_prompt = ""
+        if isinstance(chat_history, list):
+            for turn in chat_history:
+                # LangChain message objects
+                if hasattr(turn, "content"):
+                    if getattr(turn, "type", None) == "human":
+                        history_prompt += f"User: {turn.content}\n"
+                    else:
+                        history_prompt += f"AI: {turn.content}\n"
+                # Dict-based messages
+                elif isinstance(turn, dict):
+                    if turn.get("type") == "human":
+                        history_prompt += f"User: {turn.get('content', '')}\n"
+                    else:
+                        history_prompt += f"AI: {turn.get('content', '')}\n"
+                # Fallback to string
+                else:
+                    history_prompt += str(turn) + "\n"
+        elif isinstance(chat_history, str):
+            history_prompt = chat_history
+        # Add the new user message
+        full_prompt = f"{history_prompt}User: {msg.message}\nAI:"
+        gemini_llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash")
+        response = gemini_llm.invoke(full_prompt)
+        if hasattr(response, 'content'):
+            response = response.content
+        elif isinstance(response, dict) and 'content' in response:
+            response = response['content']
+        else:
+            response = str(response)
+        memory.save_context({"input": str(msg.message)}, {"output": str(response)})
+    else:
+        memory.save_context({"input": str(msg.message)}, {"output": str(response)})
+    return {"response": str(response)}
 
 # Set up templates directory
 templates = Jinja2Templates(directory="templates")
@@ -99,6 +152,8 @@ def extract_text_from_image(file_path):
 
 @app.post("/upload")
 async def upload_kb_file(file: UploadFile = File(...)):
+    if not file.filename:
+        return {"error": "No file uploaded."}
     file_ext = file.filename.split(".")[-1].lower()
     file_path = os.path.join(UPLOAD_DIR, file.filename)
     with open(file_path, "wb") as buffer:
