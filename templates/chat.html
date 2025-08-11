@@ -201,7 +201,7 @@
         sendBtn.disabled = true;
         showTyping();
         try {
-            const res = await fetch('/chat', {
+            const res = await fetch('https://rag-chatbot-5.onrender.com/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_id: 'webuser', message: messageText })
