@@ -17,7 +17,6 @@ from fastapi.staticfiles import StaticFiles
 import pdfplumber
 import docx
 from PIL import Image
-import pytesseract
 import shutil
 from langchain.schema import Document
 from google.api_core.exceptions import ResourceExhausted, GoogleAPICallError
@@ -295,8 +294,10 @@ def extract_text_from_docx(file_path):
     return "\n".join([para.text for para in doc.paragraphs])
 
 def extract_text_from_image(file_path):
-    img = Image.open(file_path)
-    return pytesseract.image_to_string(img)
+    # Placeholder for OCR functionality
+    # Note: pytesseract removed to avoid deployment issues
+    # You can add OCR functionality later if needed
+    return "Image text extraction is currently not available. Please upload PDF or DOCX files instead."
 
 @app.post("/upload")
 async def upload_kb_file(file: UploadFile = File(...)):
