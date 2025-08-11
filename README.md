@@ -39,7 +39,7 @@ pip install -r requirements.txt
 
 ### 5. Run the app
 ```bash
-uvicorn rag:app --reload
+uvicorn main:app --reload
 ```
 - Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser.
 

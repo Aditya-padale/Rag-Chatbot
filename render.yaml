@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: rag-chatbot-backend
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+      - key: GOOGLE_API_KEY
+        sync: false # This should be set in Render dashboard
+      - key: GOOGLE_GENERATIVE_AI_API_KEY
+        sync: false # This should be set in Render dashboard
+    disk:
+      name: data
+      mountPath: /opt/render/project/src/uploads
+      sizeGB: 1

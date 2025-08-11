@@ -1,0 +1,13 @@
+{
+  "name": "rag-chatbot-frontend",
+  "version": "1.0.0",
+  "description": "Modern AI Assistant RAG Chatbot Frontend",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'Build complete'",
+    "start": "echo 'Start complete'"
+  },
+  "keywords": ["rag", "chatbot", "ai", "assistant"],
+  "author": "Aditya Padale",
+  "license": "MIT"
+}
