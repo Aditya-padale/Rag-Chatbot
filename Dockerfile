@@ -1,5 +1,5 @@
 # This file helps Render detect the correct Python version
-FROM python:3.11-slim
+FROM python:3.13-slim
 
 WORKDIR /app
 
