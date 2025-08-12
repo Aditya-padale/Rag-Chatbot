@@ -31,6 +31,8 @@ app.add_middleware(
         "http://127.0.0.1:8000",
         "https://*.vercel.app",
         "https://rag-chatbot-frontend.vercel.app",
+        "https://*.onrender.com",  # Allow all Render domains
+        "*",  # Allow all origins for now (can be restricted later)
     ],
     allow_credentials=True,
     allow_methods=["*"],
