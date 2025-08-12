@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Request, HTTPException
 from pydantic import BaseModel
 from dotenv import load_dotenv
-import google.generativeai as genai
+from langchain_google_genai import ChatGoogleGenerativeAI
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, JSONResponse
 import logging
@@ -31,8 +31,6 @@ app.add_middleware(
         "http://127.0.0.1:8000",
         "https://*.vercel.app",
         "https://rag-chatbot-frontend.vercel.app",
-        "https://*.onrender.com",  # Allow all Render domains
-        "*",  # Allow all origins for now (can be restricted later)
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -53,13 +51,16 @@ try:
     if not api_key:
         raise ValueError("No Google API key found")
     
-    # Configure the Google Generative AI
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-1.5-flash')
-    logger.info("Google Generative AI initialized successfully")
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-pro",
+        temperature=0.7,
+        google_api_key=api_key,
+        max_output_tokens=1000
+    )
+    logger.info("LLM initialized successfully")
 except Exception as e:
-    logger.error(f"Failed to initialize Google Generative AI: {e}")
-    model = None
+    logger.error(f"Failed to initialize LLM: {e}")
+    llm = None
 
 class ChatMessage(BaseModel):
     message: str
@@ -95,7 +96,7 @@ async def read_root(request: Request):
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
-    return {"status": "healthy", "ai_available": model is not None}
+    return {"status": "healthy", "llm_available": llm is not None}
 
 @app.post("/chat")
 async def chat_endpoint(chat_message: ChatMessage, request: Request):
@@ -110,8 +111,8 @@ async def chat_endpoint(chat_message: ChatMessage, request: Request):
                 detail="Rate limit exceeded. Please wait before sending another message."
             )
         
-        # Check if AI model is available
-        if not model:
+        # Check if LLM is available
+        if not llm:
             raise HTTPException(
                 status_code=503,
                 detail="AI service is currently unavailable. Please try again later."
@@ -122,20 +123,25 @@ async def chat_endpoint(chat_message: ChatMessage, request: Request):
         if not user_message:
             raise HTTPException(status_code=400, detail="Message cannot be empty")
         
-        # Create a simple prompt for the AI
+        # Create a simple prompt for the LLM
         prompt = f"""You are a helpful AI assistant. Please provide a clear and helpful response to the following question:
 
 Question: {user_message}
 
 Please provide a comprehensive answer."""
         
-        # Get response from AI with retry logic
+        # Get response from LLM with retry logic
         max_retries = 3
         for attempt in range(max_retries):
             try:
-                # Generate response using Google Generative AI
-                response = model.generate_content(prompt)
-                answer = response.text
+                # Run in executor to handle potential blocking calls
+                loop = asyncio.get_event_loop()
+                response = await loop.run_in_executor(None, lambda: llm.invoke(prompt))
+                
+                if hasattr(response, 'content'):
+                    answer = response.content
+                else:
+                    answer = str(response)
                 
                 return JSONResponse({
                     "response": answer,
