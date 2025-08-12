@@ -13,9 +13,28 @@ pip install wheel setuptools
 # Install requirements with specific flags to avoid build issues
 pip install --no-cache-dir -r requirements.txt
 
-# Create necessary directories
-mkdir -p uploads
-mkdir -p faiss_index
+#!/bin/bash
+
+# Build script for Render deployment
+set -e
+
+echo "Starting build process..."
+echo "Python version:"
+python3 --version
+
+# Upgrade pip to latest version
+echo "Upgrading pip..."
+python3 -m pip install --upgrade pip setuptools wheel
+
+# Set environment variables for better builds
+export PIP_DISABLE_PIP_VERSION_CHECK=1
+export PIP_NO_CACHE_DIR=1
+
+# Install requirements with verbose output
+echo "Installing Python dependencies..."
+python3 -m pip install -r requirements.txt --verbose
+
+echo "Build completed successfully!"
 
 # Set proper permissions
 chmod -R 755 uploads || true

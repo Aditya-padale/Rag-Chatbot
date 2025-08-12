@@ -1,0 +1,17 @@
+# Alternative requirements.txt with ultra-stable versions for deployment
+# Use this if the main requirements.txt still fails
+
+fastapi==0.95.0
+uvicorn==0.20.0
+python-dotenv==0.19.2
+pdfplumber==0.7.6
+pillow==9.3.0
+jinja2==3.0.3
+python-multipart==0.0.5
+langchain==0.0.200
+langchain-community==0.0.20
+langchain-google-genai==0.0.5
+numpy==1.21.6
+faiss-cpu==1.7.3
+python-docx==0.8.11
+gunicorn==20.1.0
