@@ -1,0 +1,39 @@
+# Aditya Padale - Info & Links
+
+## 🌐 Online Profiles
+- **GitHub:** [Aditya-padale](https://github.com/Aditya-padale)
+- **LinkedIn:** [aditya-padale-alp](https://www.linkedin.com/in/aditya-padale-alp)
+- **LeetCode:** [aditya_padale](https://leetcode.com/u/aditya_padale/)
+- **Email:** [adityapadale25@gmail.com](mailto:adityapadale25@gmail.com)
+
+## 🚀 Projects
+
+### 1. [Instavibe: AI-powered Bio Generator](https://instavibe.streamlit.app/)
+- [GitHub Repo](https://github.com/Aditya-padale/Instavibe)
+- Description: Instantly generate creative bios for social & professional platforms using AI.
+
+### 2. [Rag Chatbot: AI-powered RAG Chatbot](https://aaditya-info.onrender.com)
+- [GitHub Repo](https://github.com/Aditya-padale/Rag-Chatbot)
+- Description: Ask anything about Aditya! Personalized RAG chatbot with Gemini AI.
+
+### 3. [AI Website Builder Agent](https://ai-website-builder-agent-3.onrender.com/)
+- [GitHub Repo](https://github.com/Aditya-padale/AI-Website-Builder-Agent)
+- Description: AI builds full responsive websites from prompts using Gemini AI + LangChain.
+
+### 4. [AI-GenStream: Real-time AI Media Assistant](https://ai-genstream.streamlit.app/)
+- [GitHub Repo](https://github.com/Aditya-padale/AI-GenStream)
+- Description: Real-time AI assistant for analyzing media files.
+
+### 5. [AI Calculator Canvas](https://ai-calculator-canvas.streamlit.app/)
+- [GitHub Repo](https://github.com/Aditya-padale/AI-Calculator)
+- Description: Draw math, physics, chemistry, or objects—get instant AI answers using Gemini Vision + LangChain.
+
+### 6. [Navigateme: College Campus Navigator](https://aditya-padale.github.io/navigation/)
+- [GitHub Repo](https://github.com/Aditya-padale/navigation)
+- Description: Interactive web app to explore and navigate your college campus with real-time routing.
+
+### 7. [Zanvar Group of Industries Chatbot](https://github.com/Aditya-padale/Zanvar-Internship)
+- Description: ChatGPT-like web app for data analysis, calculations, and visualizations for industry use.
+
+### 8. [Satellite Prediction Platform](https://github.com/Aditya-padale/Eurosat_ML)
+- Description: Advanced satellite image analysis using computer vision, deep learning, and AI-powered environmental reporting.
